@@ -1,0 +1,882 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>NexoMec — Manutenção preditiva para a indústria</title>
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%2322D3C5' stroke-width='1.8' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M12 8.6a3.4 3.4 0 1 0 0 6.8 3.4 3.4 0 0 0 0-6.8z'/%3E%3Cpath d='M19.8 13.4c.05-.46.05-.93 0-1.4l1.9-1.5-1.5-2.6-2.2.7c-.4-.34-.84-.62-1.3-.85L16.3 5.4h-3l-.4 2.4c-.46.23-.9.5-1.3.85l-2.2-.7-1.5 2.6 1.9 1.5c-.05.46-.05.93 0 1.4l-1.9 1.5 1.5 2.6 2.2-.7c.4.34.84.62 1.3.85l.4 2.4h3l.4-2.4c.46-.23.9-.5 1.3-.85l2.2.7 1.5-2.6-1.9-1.5z'/%3E%3C/svg%3E">
+<meta name="description" content="A NexoMec conecta sensores IoT e inteligência artificial para prever falhas industriais antes que se tornem paradas não planejadas.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;600;700&family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --blueprint:#15314A;
+    --blueprint-deep:#0E2436;
+    --blueprint-darker:#0A1B29;
+    --grid-line:rgba(234,241,248,0.07);
+    --grid-line-strong:rgba(234,241,248,0.14);
+    --ink:#EAF1F8;
+    --ink-muted:#8FA8BD;
+    --ink-faint:#6E889D;
+    --copper:#E8954A;
+    --copper-bright:#FFAE6B;
+    --signal:#6FE7B0;
+    --teal:#22D3C5;
+    --danger:#E8694A;
+    --radius:2px;
+    --maxw:1180px;
+    --font-display:'Space Grotesk',sans-serif;
+    --font-body:'Inter',sans-serif;
+    --font-mono:'JetBrains Mono',monospace;
+  }
+  *{margin:0;padding:0;box-sizing:border-box;}
+  html{scroll-behavior:smooth;}
+  body{
+    background:var(--blueprint);
+    color:var(--ink);
+    font-family:var(--font-body);
+    line-height:1.6;
+    overflow-x:hidden;
+  }
+  .bp-grid{
+    background-image:
+      linear-gradient(var(--grid-line) 1px, transparent 1px),
+      linear-gradient(90deg, var(--grid-line) 1px, transparent 1px);
+    background-size:40px 40px;
+  }
+  .wrap{max-width:var(--maxw);margin:0 auto;padding:0 28px;}
+  a{color:inherit;text-decoration:none;}
+  img{max-width:100%;display:block;}
+  ul{list-style:none;}
+  button{font-family:inherit;cursor:pointer;border:none;background:none;}
+  .hero-logo{display:flex;align-items:center;gap:10px;font-family:var(--font-display);font-size:26px;font-weight:700;margin-bottom:28px;}
+  .hero-logo .logo-mark{width:30px;height:30px;}
+  .eyebrow{
+    font-family:var(--font-mono);
+    font-size:12px;
+    letter-spacing:.14em;
+    text-transform:uppercase;
+    color:var(--copper-bright);
+    display:flex;
+    align-items:center;
+    gap:10px;
+    margin-bottom:18px;
+  }
+  .eyebrow::before{
+    content:'';
+    width:18px;height:1px;
+    background:var(--copper-bright);
+    display:inline-block;
+  }
+  h1,h2,h3,h4{font-family:var(--font-display);font-weight:600;letter-spacing:-0.01em;color:var(--ink);}
+  h2{font-size:clamp(28px,4vw,40px);line-height:1.15;}
+  h3{font-size:19px;}
+  p{color:var(--ink-muted);}
+  .section{padding:96px 0;position:relative;border-top:1px solid var(--grid-line-strong);}
+  .section-head{max-width:640px;margin-bottom:56px;}
+  .section-head p{font-size:17px;}
+  .tag-num{font-family:var(--font-mono);font-size:12px;color:var(--copper-bright);}
+
+  /* ---------- Buttons ---------- */
+  .btn{
+    display:inline-flex;align-items:center;gap:10px;
+    padding:13px 24px;
+    font-family:var(--font-mono);
+    font-size:13px;
+    letter-spacing:.04em;
+    text-transform:uppercase;
+    border-radius:var(--radius);
+    transition:transform .2s ease, box-shadow .2s ease, background .2s ease;
+    white-space:nowrap;
+  }
+  .btn-primary{
+    background:var(--copper);
+    color:var(--blueprint-darker);
+    font-weight:600;
+  }
+  .btn-primary:hover{background:var(--copper-bright);transform:translateY(-1px);}
+  .btn-ghost{
+    border:1px solid var(--grid-line-strong);
+    color:var(--ink);
+  }
+  .btn-ghost:hover{border-color:var(--copper-bright);color:var(--copper-bright);}
+
+  /* ---------- Header ---------- */
+  header{
+    position:fixed;top:0;left:0;right:0;z-index:100;
+    background:rgba(10,27,41,0.85);
+    backdrop-filter:blur(10px);
+    border-bottom:1px solid var(--grid-line);
+  }
+  .nav{display:flex;align-items:center;justify-content:space-between;height:74px;}
+  .logo{display:flex;align-items:center;gap:9px;font-family:var(--font-display);font-size:19px;font-weight:700;letter-spacing:.01em;}
+  .logo-mark{width:22px;height:22px;flex-shrink:0;color:var(--teal);}
+  .logo-mark svg{width:100%;height:100%;display:block;}
+  .logo-nexo{color:var(--teal);}
+  .logo-mec{color:var(--ink);}
+  nav.links{display:flex;gap:36px;}
+  nav.links a{font-size:14px;color:var(--ink-muted);transition:color .2s;}
+  nav.links a:hover{color:var(--ink);}
+  .nav-actions{display:flex;align-items:center;gap:18px;}
+  .nav-toggle{display:none;flex-direction:column;gap:5px;width:24px;}
+  .nav-toggle span{height:1px;background:var(--ink);width:100%;}
+
+  @media (max-width:860px){
+    nav.links{position:fixed;top:74px;left:0;right:0;background:var(--blueprint-darker);flex-direction:column;padding:24px 28px;gap:20px;border-bottom:1px solid var(--grid-line-strong);transform:translateY(-110%);transition:transform .3s ease;}
+    nav.links.open{transform:translateY(0);}
+    .nav-toggle{display:flex;}
+    .nav-actions .btn-primary{padding:10px 16px;font-size:12px;}
+  }
+
+  /* ---------- Hero ---------- */
+  .hero{
+    padding:170px 0 110px;
+    position:relative;
+  }
+  .hero .wrap{
+    display:grid;
+    grid-template-columns:1.05fr 0.95fr;
+    gap:60px;
+    align-items:center;
+  }
+  .hero h1{font-size:clamp(34px,5.4vw,58px);line-height:1.08;margin-bottom:22px;}
+  .hero h1 em{font-style:normal;color:var(--copper-bright);}
+  .hero p.lead{font-size:18px;max-width:480px;margin-bottom:36px;}
+  .hero-ctas{display:flex;gap:16px;flex-wrap:wrap;margin-bottom:48px;}
+  .hero-meta{display:flex;gap:32px;font-family:var(--font-mono);font-size:12px;color:var(--ink-faint);flex-wrap:wrap;}
+  .hero-meta span b{color:var(--ink-muted);display:block;font-size:11px;font-weight:500;text-transform:uppercase;letter-spacing:.06em;margin-bottom:4px;}
+
+  /* instrument panel */
+  .panel{
+    background:var(--blueprint-deep);
+    border:1px solid var(--grid-line-strong);
+    position:relative;
+    padding:22px;
+  }
+  .panel::before{
+    content:'';position:absolute;top:-1px;left:-1px;width:14px;height:14px;border-top:1px solid var(--copper-bright);border-left:1px solid var(--copper-bright);
+  }
+  .panel::after{
+    content:'';position:absolute;bottom:-1px;right:-1px;width:14px;height:14px;border-bottom:1px solid var(--copper-bright);border-right:1px solid var(--copper-bright);
+  }
+  .panel-top{display:flex;justify-content:space-between;align-items:center;font-family:var(--font-mono);font-size:11px;color:var(--ink-faint);text-transform:uppercase;letter-spacing:.08em;margin-bottom:14px;}
+  .status-pill{
+    display:flex;align-items:center;gap:7px;
+    font-family:var(--font-mono);font-size:11px;
+    padding:5px 10px;border:1px solid var(--grid-line-strong);
+  }
+  .status-dot{width:6px;height:6px;border-radius:50%;background:var(--copper);transition:background .4s ease;}
+  .status-pill.stable .status-dot{background:var(--signal);box-shadow:0 0 8px var(--signal);}
+  canvas#waveform{width:100%;height:140px;display:block;}
+  .readouts{display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-top:16px;}
+  .readout{border-top:1px solid var(--grid-line-strong);padding-top:10px;}
+  .readout .label{font-family:var(--font-mono);font-size:10px;color:var(--ink-faint);text-transform:uppercase;letter-spacing:.08em;}
+  .readout .value{font-family:var(--font-mono);font-size:22px;color:var(--ink);margin-top:2px;}
+  .readout .value span{font-size:12px;color:var(--ink-faint);}
+
+  /* ---------- Trust strip ---------- */
+  .trust{
+    border-top:1px solid var(--grid-line-strong);
+    border-bottom:1px solid var(--grid-line-strong);
+    background:var(--blueprint-darker);
+    padding:40px 0;
+  }
+  .trust .wrap{display:flex;align-items:center;gap:48px;flex-wrap:wrap;justify-content:space-between;}
+  .trust-label{font-family:var(--font-mono);font-size:11px;color:var(--ink-faint);text-transform:uppercase;letter-spacing:.08em;max-width:160px;}
+  .trust-items{display:flex;gap:44px;flex-wrap:wrap;}
+  .trust-item{font-family:var(--font-mono);font-size:13px;color:var(--ink-muted);display:flex;flex-direction:column;gap:3px;}
+  .trust-item b{font-family:var(--font-display);font-size:16px;color:var(--ink);font-weight:600;}
+
+  /* ---------- Cards grid (solutions) ---------- */
+  .cards3{display:grid;grid-template-columns:repeat(3,1fr);gap:1px;background:var(--grid-line-strong);border:1px solid var(--grid-line-strong);}
+  .card{background:var(--blueprint);padding:36px 30px;position:relative;transition:background .25s ease;}
+  .card:hover{background:var(--blueprint-deep);}
+  .card .tag-num{display:block;margin-bottom:18px;}
+  .card h3{margin-bottom:12px;}
+  .card p{font-size:14.5px;}
+
+  /* ---------- Platform two-col ---------- */
+  .platform{display:grid;grid-template-columns:1fr 1fr;gap:64px;align-items:center;}
+  .platform-copy ul{display:flex;flex-direction:column;gap:22px;margin-top:28px;}
+  .platform-copy li{display:flex;gap:14px;font-size:14.5px;color:var(--ink-muted);}
+  .platform-copy li b{color:var(--ink);display:block;font-family:var(--font-display);font-size:15px;margin-bottom:3px;font-weight:600;}
+  .platform-copy li::before{content:'';width:6px;height:6px;margin-top:7px;background:var(--copper-bright);flex-shrink:0;}
+
+  .dash-mock{background:var(--blueprint-darker);border:1px solid var(--grid-line-strong);padding:20px;}
+  .dash-mock-top{display:flex;gap:8px;margin-bottom:18px;}
+  .dash-mock-top span{width:8px;height:8px;border-radius:50%;background:var(--grid-line-strong);}
+  .dash-mock-top span:first-child{background:var(--copper);}
+  .dash-grid{display:grid;grid-template-columns:1fr 1fr;gap:14px;}
+  .dash-card{border:1px solid var(--grid-line-strong);padding:14px;}
+  .dash-card .label{font-family:var(--font-mono);font-size:10px;color:var(--ink-faint);text-transform:uppercase;margin-bottom:10px;letter-spacing:.06em;}
+  .bar-row{display:flex;align-items:flex-end;gap:4px;height:46px;}
+  .bar-row i{flex:1;background:var(--copper);opacity:.55;}
+  .bar-row i:nth-child(odd){background:var(--signal);opacity:.5;}
+  .dash-line{height:46px;position:relative;overflow:hidden;}
+  .dash-line svg{width:100%;height:100%;}
+  .dash-card.wide{grid-column:1/-1;}
+  .dash-num{font-family:var(--font-mono);font-size:26px;color:var(--ink);}
+  .dash-num small{font-size:12px;color:var(--ink-faint);}
+
+  /* ---------- Steps ---------- */
+  .steps{display:grid;grid-template-columns:repeat(4,1fr);gap:0;border-top:1px solid var(--grid-line-strong);}
+  .step{padding:32px 26px 32px 0;border-right:1px solid var(--grid-line-strong);position:relative;}
+  .step:last-child{border-right:none;}
+  .step .tag-num{font-size:28px;color:var(--grid-line-strong);font-family:var(--font-display);display:block;margin-bottom:18px;}
+  .step h4{font-size:16px;margin-bottom:8px;}
+  .step p{font-size:13.5px;}
+
+  /* ---------- AI cards ---------- */
+  .ai-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:28px;}
+  .ai-card{border:1px solid var(--grid-line-strong);padding:30px;background:var(--blueprint-deep);}
+  .ai-icon{width:38px;height:38px;border:1px solid var(--copper-bright);position:relative;margin-bottom:24px;}
+  .ai-icon::before{content:'';position:absolute;width:8px;height:8px;background:var(--signal);border-radius:50%;top:50%;left:50%;transform:translate(-50%,-50%);}
+
+  /* ---------- Integration ---------- */
+  .integration{display:flex;flex-direction:column;gap:0;}
+  .integ-row{display:grid;grid-template-columns:60px 1fr;gap:24px;padding:30px 0;border-top:1px solid var(--grid-line-strong);}
+  .integ-row:first-child{border-top:none;}
+  .integ-num{font-family:var(--font-mono);font-size:13px;color:var(--copper-bright);}
+  .integ-row h4{margin-bottom:6px;font-size:17px;}
+  .integ-row p{font-size:14.5px;max-width:560px;}
+
+  /* ---------- About ---------- */
+  .about{display:grid;grid-template-columns:1fr 1fr;gap:64px;}
+  .about p{font-size:15.5px;margin-bottom:18px;}
+  .about-stats{display:grid;grid-template-columns:1fr 1fr;gap:1px;background:var(--grid-line-strong);border:1px solid var(--grid-line-strong);align-content:start;}
+
+  /* ---------- Photo grid ---------- */
+  .photo-grid{display:grid;grid-template-columns:1.4fr 1fr;grid-template-rows:repeat(2,170px);gap:14px;}
+  .photo-card{position:relative;overflow:hidden;border:1px solid var(--grid-line-strong);}
+  .photo-card.large{grid-row:1/3;}
+  .photo-card img{width:100%;height:100%;object-fit:cover;display:block;filter:grayscale(.55) contrast(1.05) brightness(.8) saturate(1.1);transition:filter .5s ease, transform .8s ease;}
+  .photo-card::after{content:'';position:absolute;inset:0;background:linear-gradient(180deg, rgba(21,49,74,.1) 30%, rgba(10,27,41,.85));z-index:1;pointer-events:none;}
+  .photo-card::before{content:'';position:absolute;inset:0;border:1px solid transparent;z-index:2;pointer-events:none;}
+  .photo-card:hover img{filter:grayscale(.2) contrast(1.05) brightness(.92) saturate(1.1);transform:scale(1.05);}
+  .photo-card figcaption{position:absolute;left:16px;bottom:14px;right:16px;font-family:var(--font-mono);font-size:11px;color:var(--ink);text-transform:uppercase;letter-spacing:.05em;z-index:2;}
+  .photo-card .ph-num{position:absolute;top:14px;left:16px;font-family:var(--font-mono);font-size:11px;color:var(--copper-bright);z-index:2;}
+  @media (max-width:780px){
+    .photo-grid{grid-template-columns:1fr;grid-template-rows:none;}
+    .photo-card.large{grid-row:auto;height:220px;}
+    .photo-card{height:170px;}
+  }
+
+  /* ---------- Donut chart ---------- */
+  .donut-card{display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;}
+  .donut-wrap{position:relative;width:84px;height:84px;margin-top:4px;}
+  .donut-wrap svg{width:100%;height:100%;}
+  .donut-fill{stroke-dasharray:213.6;stroke-dashoffset:213.6;transition:stroke-dashoffset 1.4s cubic-bezier(.16,1,.3,1);}
+  .dash-mock.in-view .donut-fill{stroke-dashoffset:17.1;}
+  .donut-label{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;font-family:var(--font-mono);font-size:15px;color:var(--ink);}
+
+  /* ---------- Animated bars / lines ---------- */
+  .bar-row i{height:0;transition:height .9s cubic-bezier(.16,1,.3,1);}
+  .dash-mock.in-view .bar-row i{height:var(--h);}
+  .bar-row i:nth-child(1){transition-delay:.02s;} .bar-row i:nth-child(2){transition-delay:.06s;}
+  .bar-row i:nth-child(3){transition-delay:.10s;} .bar-row i:nth-child(4){transition-delay:.14s;}
+  .bar-row i:nth-child(5){transition-delay:.18s;} .bar-row i:nth-child(6){transition-delay:.22s;}
+  .bar-row i:nth-child(7){transition-delay:.26s;} .bar-row i:nth-child(8){transition-delay:.30s;}
+  .bar-row i:nth-child(9){transition-delay:.34s;} .bar-row i:nth-child(10){transition-delay:.38s;}
+  .draw-line{stroke-dasharray:600;stroke-dashoffset:600;transition:stroke-dashoffset 1.6s cubic-bezier(.16,1,.3,1);}
+  .dash-mock.in-view .draw-line{stroke-dashoffset:0;}
+
+  /* ---------- Trust ticker ---------- */
+  .ticker{overflow:hidden;flex:1;}
+  .ticker-track{display:flex;gap:44px;width:max-content;animation:ticker-scroll 22s linear infinite;}
+  @media (prefers-reduced-motion:reduce){.ticker-track{animation:none;}}
+  @keyframes ticker-scroll{ from{transform:translateX(0);} to{transform:translateX(-50%);} }
+  .stat{background:var(--blueprint);padding:24px 22px;}
+  .stat .num{font-family:var(--font-display);font-size:26px;color:var(--copper-bright);}
+  .stat .lbl{font-family:var(--font-mono);font-size:11px;color:var(--ink-faint);text-transform:uppercase;letter-spacing:.06em;margin-top:6px;}
+
+  /* ---------- Contact ---------- */
+  .contact-grid{display:grid;grid-template-columns:0.9fr 1.1fr;gap:64px;}
+  .contact-info{display:flex;flex-direction:column;gap:28px;}
+  .contact-info-item .label{font-family:var(--font-mono);font-size:11px;color:var(--ink-faint);text-transform:uppercase;letter-spacing:.06em;margin-bottom:6px;}
+  .contact-info-item .val{font-size:16px;color:var(--ink);}
+  form{display:flex;flex-direction:column;gap:18px;}
+  .form-row{display:grid;grid-template-columns:1fr 1fr;gap:18px;}
+  label{display:block;font-family:var(--font-mono);font-size:11px;color:var(--ink-faint);text-transform:uppercase;letter-spacing:.06em;margin-bottom:8px;}
+  input,select,textarea{
+    width:100%;background:transparent;border:none;border-bottom:1px solid var(--grid-line-strong);
+    color:var(--ink);font-family:var(--font-body);font-size:15px;padding:8px 0;
+  }
+  select{appearance:none;background-image:none;}
+  select option{background:var(--blueprint-deep);color:var(--ink);}
+  input::placeholder,textarea::placeholder{color:var(--ink-faint);}
+  input:focus,select:focus,textarea:focus{outline:none;border-bottom-color:var(--copper-bright);}
+  textarea{resize:vertical;min-height:80px;}
+  .form-note{font-family:var(--font-mono);font-size:11px;color:var(--ink-faint);margin-top:-4px;}
+
+  /* ---------- Footer ---------- */
+  footer{background:var(--blueprint-darker);border-top:1px solid var(--grid-line-strong);padding:60px 0 30px;}
+  .footer-top{display:flex;justify-content:space-between;flex-wrap:wrap;gap:40px;margin-bottom:50px;}
+  .footer-tagline{max-width:280px;font-size:14px;}
+  .footer-cols{display:flex;gap:60px;flex-wrap:wrap;}
+  .footer-col h5{font-family:var(--font-mono);font-size:11px;text-transform:uppercase;letter-spacing:.08em;color:var(--ink-faint);margin-bottom:16px;}
+  .footer-col a{display:block;font-size:14px;color:var(--ink-muted);margin-bottom:10px;}
+  .footer-col a:hover{color:var(--ink);}
+  .footer-bottom{display:flex;justify-content:space-between;flex-wrap:wrap;gap:12px;border-top:1px solid var(--grid-line);padding-top:24px;font-family:var(--font-mono);font-size:12px;color:var(--ink-faint);}
+
+  /* ---------- Reveal animation ---------- */
+  .reveal{opacity:0;transform:translateY(24px);transition:opacity .7s ease, transform .7s ease;}
+  .reveal.in-view{opacity:1;transform:translateY(0);}
+
+  @media (prefers-reduced-motion:reduce){
+    .reveal{transition:none;opacity:1;transform:none;}
+    html{scroll-behavior:auto;}
+  }
+
+  /* ---------- Responsive ---------- */
+  @media (max-width:980px){
+    .hero .wrap{grid-template-columns:1fr;}
+    .hero{padding-top:130px;}
+    .platform{grid-template-columns:1fr;}
+    .about{grid-template-columns:1fr;}
+    .contact-grid{grid-template-columns:1fr;}
+    .cards3{grid-template-columns:1fr;}
+    .steps{grid-template-columns:1fr 1fr;}
+    .ai-grid{grid-template-columns:1fr;}
+  }
+  @media (max-width:600px){
+    .steps{grid-template-columns:1fr;}
+    .step{border-right:none;border-bottom:1px solid var(--grid-line-strong);}
+    .form-row{grid-template-columns:1fr;}
+    .trust .wrap{flex-direction:column;align-items:flex-start;}
+    .footer-top{flex-direction:column;}
+  }
+</style>
+</head>
+<body>
+
+<header>
+  <div class="wrap nav">
+    <a href="#top" class="logo"><span class="logo-mark"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M12 8.6a3.4 3.4 0 1 0 0 6.8 3.4 3.4 0 0 0 0-6.8z"/><path d="M19.8 13.4c.05-.46.05-.93 0-1.4l1.9-1.5-1.5-2.6-2.2.7c-.4-.34-.84-.62-1.3-.85L16.3 5.4h-3l-.4 2.4c-.46.23-.9.5-1.3.85l-2.2-.7-1.5 2.6 1.9 1.5c-.05.46-.05.93 0 1.4l-1.9 1.5 1.5 2.6 2.2-.7c.4.34.84.62 1.3.85l.4 2.4h3l.4-2.4c.46-.23.9-.5 1.3-.85l2.2.7 1.5-2.6-1.9-1.5z"/></svg></span><span class="logo-nexo">Nexo</span><span class="logo-mec">Mec</span></a>
+    <nav class="links" id="navLinks">
+      <a href="#solucoes">Soluções</a>
+      <a href="#plataforma">Plataforma</a>
+      <a href="#como-funciona">Como Funciona</a>
+      <a href="#fotos">Fábrica</a>
+      <a href="#sobre">Sobre</a>
+      <a href="#contato">Contato</a>
+    </nav>
+    <div class="nav-actions">
+      <a href="#contato" class="btn btn-primary">Solicitar Demonstração</a>
+      <button class="nav-toggle" id="navToggle" aria-label="Abrir menu"><span></span><span></span><span></span></button>
+    </div>
+  </div>
+</header>
+
+<main id="top">
+
+  <!-- HERO -->
+  <section class="hero bp-grid">
+    <div class="wrap">
+      <div>
+        <div class="hero-logo">
+          <span class="logo-mark"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M12 8.6a3.4 3.4 0 1 0 0 6.8 3.4 3.4 0 0 0 0-6.8z"/><path d="M19.8 13.4c.05-.46.05-.93 0-1.4l1.9-1.5-1.5-2.6-2.2.7c-.4-.34-.84-.62-1.3-.85L16.3 5.4h-3l-.4 2.4c-.46.23-.9.5-1.3.85l-2.2-.7-1.5 2.6 1.9 1.5c-.05.46-.05.93 0 1.4l-1.9 1.5 1.5 2.6 2.2-.7c.4.34.84.62 1.3.85l.4 2.4h3l.4-2.4c.46-.23.9-.5 1.3-.85l2.2.7 1.5-2.6-1.9-1.5z"/></svg></span>
+          <span class="logo-nexo">Nexo</span><span class="logo-mec">Mec</span>
+        </div>
+        <div class="eyebrow">Monitoramento Industrial IoT + IA</div>
+        <h1>Sua indústria <em>não pode</em> parar.</h1>
+        <p class="lead">A NexoMec conecta sensores IoT e inteligência artificial para prever falhas em ativos industriais antes que se tornem paradas não planejadas.</p>
+        <div class="hero-ctas">
+          <a href="#contato" class="btn btn-primary">Solicitar Demonstração</a>
+          <a href="#como-funciona" class="btn btn-ghost">Como Funciona</a>
+        </div>
+        <div class="hero-meta">
+          <span><b>Atuação</b>Ceará · Pernambuco</span>
+          <span><b>Apoio acadêmico</b>UFC · UFPE</span>
+          <span><b>Foco</b>Manutenção preditiva</span>
+        </div>
+      </div>
+
+      <div class="panel">
+        <div class="panel-top">
+          <span>LEITURA · ATIVO 04 / MOTOR-B</span>
+          <span class="status-pill" id="statusPill"><span class="status-dot"></span><span id="statusText">MONITORANDO</span></span>
+        </div>
+        <canvas id="waveform" width="600" height="160"></canvas>
+        <div class="readouts">
+          <div class="readout">
+            <div class="label">Vibração</div>
+            <div class="value" id="vibVal">—<span> mm/s²</span></div>
+          </div>
+          <div class="readout">
+            <div class="label">Temperatura</div>
+            <div class="value" id="tempVal">—<span> °C</span></div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- TRUST -->
+  <section class="trust">
+    <div class="wrap reveal" style="display:flex;align-items:center;gap:32px;">
+      <div class="trust-label">Construída com base científica e foco regional</div>
+      <div class="ticker">
+        <div class="ticker-track">
+          <div class="trust-item"><b>UFC</b>Universidade Federal do Ceará</div>
+          <div class="trust-item"><b>UFPE</b>Universidade Federal de Pernambuco</div>
+          <div class="trust-item"><b>2 estados</b>Ceará e Pernambuco</div>
+          <div class="trust-item"><b>Próximo passo</b>Expansão nacional</div>
+          <div class="trust-item"><b>UFC</b>Universidade Federal do Ceará</div>
+          <div class="trust-item"><b>UFPE</b>Universidade Federal de Pernambuco</div>
+          <div class="trust-item"><b>2 estados</b>Ceará e Pernambuco</div>
+          <div class="trust-item"><b>Próximo passo</b>Expansão nacional</div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- SOLUÇÕES -->
+  <section class="section" id="solucoes">
+    <div class="wrap">
+      <div class="section-head reveal">
+        <div class="eyebrow">O que a NexoMec entrega</div>
+        <h2>Da leitura do sensor à decisão de manutenção</h2>
+      </div>
+      <div class="cards3 reveal">
+        <div class="card">
+          <span class="tag-num">01</span>
+          <h3>Sensores IoT</h3>
+          <p>Vibração, temperatura e outros parâmetros críticos monitorados continuamente, sem fios e sem precisar parar a produção para instalar.</p>
+        </div>
+        <div class="card">
+          <span class="tag-num">02</span>
+          <h3>IA Preditiva</h3>
+          <p>Diagnósticos automáticos que aprendem com o histórico de cada ativo e apontam o problema antes da quebra acontecer.</p>
+        </div>
+        <div class="card">
+          <span class="tag-num">03</span>
+          <h3>Centro de Controle</h3>
+          <p>Um painel único que une dados técnicos e indicadores de gestão — do chão de fábrica até a diretoria.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- PLATAFORMA -->
+  <section class="section" id="plataforma">
+    <div class="wrap platform">
+      <div class="platform-copy reveal">
+        <div class="eyebrow">Centro de Controle NexoMec</div>
+        <h2>Poderoso na análise. Simples no uso.</h2>
+        <p>Uma experiência pensada para conectar quem opera a máquina a quem decide o orçamento de manutenção.</p>
+        <ul>
+          <li><div><b>Navegação intuitiva</b>Configure ativos e acompanhe alertas sem treinamentos complexos.</div></li>
+          <li><div><b>Visão técnica e gerencial</b>Análise detalhada para a equipe de manutenção e indicadores executivos para a liderança, no mesmo lugar.</div></li>
+          <li><div><b>Alertas em tempo real</b>Notificações por e-mail e WhatsApp quando um ativo sai do padrão esperado.</div></li>
+        </ul>
+      </div>
+
+      <div class="dash-mock reveal">
+        <div class="dash-mock-top"><span></span><span></span><span></span></div>
+        <div class="dash-grid">
+          <div class="dash-card">
+            <div class="label">Ativos monitorados</div>
+            <div class="dash-num"><span class="count-up" data-target="128">0</span><small> ativos</small></div>
+          </div>
+          <div class="dash-card donut-card">
+            <div class="label">Saúde dos ativos</div>
+            <div class="donut-wrap">
+              <svg viewBox="0 0 80 80">
+                <circle cx="40" cy="40" r="34" fill="none" stroke="var(--grid-line-strong)" stroke-width="8"/>
+                <circle class="donut-fill" cx="40" cy="40" r="34" fill="none" stroke="var(--signal)" stroke-width="8" stroke-linecap="round" transform="rotate(-90 40 40)"/>
+              </svg>
+              <div class="donut-label"><span class="count-up" data-target="92">0</span>%</div>
+            </div>
+          </div>
+          <div class="dash-card wide">
+            <div class="label">Vibração — últimas 24h</div>
+            <div class="dash-line"><svg viewBox="0 0 300 50" preserveAspectRatio="none"><polyline class="draw-line" points="0,30 20,28 40,32 60,25 80,29 100,20 120,26 140,18 160,24 180,15 200,21 220,14 240,19 260,12 280,16 300,10" fill="none" stroke="#6FE7B0" stroke-width="2"/></svg></div>
+          </div>
+          <div class="dash-card wide">
+            <div class="label">Status dos ativos</div>
+            <div class="bar-row"><i style="--h:30%"></i><i style="--h:55%"></i><i style="--h:40%"></i><i style="--h:70%"></i><i style="--h:35%"></i><i style="--h:60%"></i><i style="--h:45%"></i><i style="--h:80%"></i><i style="--h:50%"></i><i style="--h:65%"></i></div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- COMO FUNCIONA -->
+  <section class="section" id="como-funciona" style="padding-bottom:0;">
+    <div class="wrap">
+      <div class="section-head reveal">
+        <div class="eyebrow">Implementação simples</div>
+        <h2>Do sensor ao alerta, em quatro passos</h2>
+      </div>
+    </div>
+    <div class="wrap">
+      <div class="steps reveal">
+        <div class="step">
+          <span class="tag-num">01</span>
+          <h4>Instale os sensores</h4>
+          <p>Fixação simples, sem cabos e sem parar a produção.</p>
+        </div>
+        <div class="step">
+          <span class="tag-num">02</span>
+          <h4>Conecte o gateway</h4>
+          <p>Conectividade por Wi-Fi, ethernet ou rede celular.</p>
+        </div>
+        <div class="step">
+          <span class="tag-num">03</span>
+          <h4>Configure na plataforma</h4>
+          <p>Cadastre o ativo e defina os limites de operação.</p>
+        </div>
+        <div class="step">
+          <span class="tag-num">04</span>
+          <h4>Receba os alertas</h4>
+          <p>Notificação por e-mail, WhatsApp e painel web.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- IA -->
+  <section class="section">
+    <div class="wrap">
+      <div class="section-head reveal">
+        <div class="eyebrow">Inteligência artificial aplicada</div>
+        <h2>Diagnóstico automático, em constante evolução</h2>
+        <p>Transformamos leituras de sensor em recomendações práticas para a sua equipe de manutenção.</p>
+      </div>
+      <div class="ai-grid reveal">
+        <div class="ai-card">
+          <div class="ai-icon"></div>
+          <h3>Aprende</h3>
+          <p>Baseado em normas técnicas e no histórico de ativos semelhantes.</p>
+        </div>
+        <div class="ai-card">
+          <div class="ai-icon"></div>
+          <h3>Melhora</h3>
+          <p>Aprimora as recomendações a partir do retorno real da sua equipe de manutenção.</p>
+        </div>
+        <div class="ai-card">
+          <div class="ai-icon"></div>
+          <h3>Se adapta</h3>
+          <p>Ajusta-se ao comportamento específico de cada equipamento monitorado.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- INTEGRAÇÃO -->
+  <section class="section">
+    <div class="wrap">
+      <div class="section-head reveal">
+        <div class="eyebrow">Conectividade sem barreiras</div>
+        <h2>Um único ecossistema para os dados da sua planta</h2>
+      </div>
+      <div class="integration reveal">
+        <div class="integ-row">
+          <span class="integ-num">01</span>
+          <div>
+            <h4>Coleta flexível e híbrida</h4>
+            <p>Sensores NexoMec monitoram vibração e temperatura sem fio. Sistemas legados se conectam via integração com PLCs e portais OPC.</p>
+          </div>
+        </div>
+        <div class="integ-row">
+          <span class="integ-num">02</span>
+          <div>
+            <h4>Centro de Controle como hub central</h4>
+            <p>Unifica dados de sensores novos e sistemas legados em uma única interface, com padronização e roteamento eficiente.</p>
+          </div>
+        </div>
+        <div class="integ-row">
+          <span class="integ-num">03</span>
+          <div>
+            <h4>Ação integrada ao fluxo de manutenção</h4>
+            <p>Alertas conectados a e-mail e WhatsApp hoje — com integração a sistemas de gestão (ERP/CMMS) no roteiro de evolução da plataforma.</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- FOTOS -->
+  <section class="section" id="fotos">
+    <div class="wrap">
+      <div class="section-head reveal">
+        <div class="eyebrow">Direto do chão de fábrica</div>
+        <h2>Onde os dados da NexoMec nascem</h2>
+        <p>Sensores instalados em ativos reais, painéis de controle e gente de campo — a base de tudo que aparece no Centro de Controle.</p>
+      </div>
+      <div class="photo-grid reveal">
+        <figure class="photo-card large">
+          <span class="ph-num">01</span>
+          <img src="https://images.unsplash.com/photo-1717386255773-1e3037c81788?auto=format&fit=crop&w=1200&q=60" alt="Linha de produção automatizada em fábrica" loading="lazy">
+          <figcaption>Linha de produção — ativos críticos monitorados em tempo real</figcaption>
+        </figure>
+        <figure class="photo-card">
+          <span class="ph-num">02</span>
+          <img src="https://images.unsplash.com/photo-1567664883526-8f401f277a27?auto=format&fit=crop&w=900&q=60" alt="Painel de controle industrial com medidores e botões" loading="lazy">
+          <figcaption>Painel de controle</figcaption>
+        </figure>
+        <figure class="photo-card">
+          <span class="ph-num">03</span>
+          <img src="https://images.unsplash.com/photo-1705579612477-20866d78deeb?auto=format&fit=crop&w=900&q=60" alt="Engenheiro em campo com equipamento de proteção" loading="lazy">
+          <figcaption>Engenharia de campo</figcaption>
+        </figure>
+        <figure class="photo-card">
+          <span class="ph-num">04</span>
+          <img src="https://images.unsplash.com/photo-1745921204896-c2011440a4e2?auto=format&fit=crop&w=900&q=60" alt="Maquinário industrial em planta fabril" loading="lazy">
+          <figcaption>Ativos industriais</figcaption>
+        </figure>
+      </div>
+    </div>
+  </section>
+
+  <!-- SOBRE -->
+  <section class="section" id="sobre">
+    <div class="wrap about">
+      <div class="reveal">
+        <div class="eyebrow">Por que a NexoMec</div>
+        <h2>Uma startup construída perto da indústria</h2>
+        <p>A NexoMec nasceu da combinação entre engenharia industrial e ciência de dados, com apoio acadêmico da UFC e da UFPE. Hoje atuamos com clientes no Ceará e em Pernambuco — e estamos estruturando os próximos passos para levar manutenção preditiva acessível para o resto do Brasil.</p>
+        <p>Um time fundador multidisciplinar — CEO, CTO, CFO e COO — conduz a operação, o produto e a estratégia de expansão da empresa.</p>
+      </div>
+      <div class="about-stats reveal">
+        <div class="stat"><div class="num"><span class="count-up" data-target="2">0</span></div><div class="lbl">Estados de atuação</div></div>
+        <div class="stat"><div class="num"><span class="count-up" data-target="2">0</span></div><div class="lbl">Parcerias acadêmicas</div></div>
+        <div class="stat"><div class="num"><span class="count-up" data-target="4">0</span></div><div class="lbl">Sócios fundadores</div></div>
+        <div class="stat"><div class="num">BR</div><div class="lbl">Plano de expansão nacional</div></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- CONTATO -->
+  <section class="section" id="contato">
+    <div class="wrap contact-grid">
+      <div class="contact-info reveal">
+        <div class="eyebrow">Entre em contato</div>
+        <h2>Vamos conversar sobre a sua planta</h2>
+        <p>Conte um pouco sobre os ativos que você quer monitorar e nossa equipe retorna com os próximos passos.</p>
+        <div class="contact-info-item">
+          <div class="label">E-mail</div>
+          <div class="val">contato@nexomec.com.br</div>
+        </div>
+        <div class="contact-info-item">
+          <div class="label">Telefone / WhatsApp</div>
+          <div class="val">(85) 99429-8158</div>
+        </div>
+        <div class="contact-info-item">
+          <div class="label">Atuação</div>
+          <div class="val">Ceará e Pernambuco, Brasil</div>
+        </div>
+        <p class="form-note">* O e-mail acima ainda é um placeholder — substitua pelo e-mail real da NexoMec.</p>
+      </div>
+
+      <form class="reveal" onsubmit="event.preventDefault(); alert('Formulário de demonstração — conecte a um backend ou serviço de e-mail para receber os envios.');">
+        <div class="form-row">
+          <div>
+            <label for="nome">Nome completo</label>
+            <input id="nome" type="text" placeholder="Seu nome" required>
+          </div>
+          <div>
+            <label for="empresa">Empresa</label>
+            <input id="empresa" type="text" placeholder="Nome da empresa" required>
+          </div>
+        </div>
+        <div class="form-row">
+          <div>
+            <label for="email">E-mail</label>
+            <input id="email" type="email" placeholder="voce@empresa.com" required>
+          </div>
+          <div>
+            <label for="telefone">Telefone / WhatsApp</label>
+            <input id="telefone" type="tel" placeholder="(00) 00000-0000">
+          </div>
+        </div>
+        <div>
+          <label for="setor">Setor da indústria</label>
+          <select id="setor">
+            <option>Alimentício</option>
+            <option>Têxtil</option>
+            <option>Metalúrgico</option>
+            <option>Químico</option>
+            <option>Energia</option>
+            <option>Outro</option>
+          </select>
+        </div>
+        <div>
+          <label for="mensagem">Mensagem</label>
+          <textarea id="mensagem" placeholder="Conte sobre os ativos que você quer monitorar"></textarea>
+        </div>
+        <button type="submit" class="btn btn-primary" style="margin-top:8px;align-self:flex-start;">Solicitar Demonstração</button>
+      </form>
+    </div>
+  </section>
+
+</main>
+
+<footer>
+  <div class="wrap">
+    <div class="footer-top">
+      <div>
+        <a href="#top" class="logo" style="margin-bottom:14px;display:flex;"><span class="logo-mark"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M12 8.6a3.4 3.4 0 1 0 0 6.8 3.4 3.4 0 0 0 0-6.8z"/><path d="M19.8 13.4c.05-.46.05-.93 0-1.4l1.9-1.5-1.5-2.6-2.2.7c-.4-.34-.84-.62-1.3-.85L16.3 5.4h-3l-.4 2.4c-.46.23-.9.5-1.3.85l-2.2-.7-1.5 2.6 1.9 1.5c-.05.46-.05.93 0 1.4l-1.9 1.5 1.5 2.6 2.2-.7c.4.34.84.62 1.3.85l.4 2.4h3l.4-2.4c.46-.23.9-.5 1.3-.85l2.2.7 1.5-2.6-1.9-1.5z"/></svg></span><span class="logo-nexo">Nexo</span><span class="logo-mec">Mec</span></a>
+        <p class="footer-tagline">Manutenção preditiva para a indústria brasileira, com sensores IoT e inteligência artificial.</p>
+      </div>
+      <div class="footer-cols">
+        <div class="footer-col">
+          <h5>Produto</h5>
+          <a href="#solucoes">Soluções</a>
+          <a href="#plataforma">Plataforma</a>
+          <a href="#como-funciona">Como Funciona</a>
+        </div>
+        <div class="footer-col">
+          <h5>Empresa</h5>
+          <a href="#sobre">Sobre</a>
+          <a href="#contato">Contato</a>
+        </div>
+      </div>
+    </div>
+    <div class="footer-bottom">
+      <span>© 2026 NexoMec. Todos os direitos reservados.</span>
+      <span>Ceará · Pernambuco · Brasil</span>
+    </div>
+  </div>
+</footer>
+
+<script>
+  // Mobile nav toggle
+  const navToggle = document.getElementById('navToggle');
+  const navLinks = document.getElementById('navLinks');
+  navToggle.addEventListener('click', () => navLinks.classList.toggle('open'));
+  navLinks.querySelectorAll('a').forEach(a => a.addEventListener('click', () => navLinks.classList.remove('open')));
+
+  // Scroll reveal
+  const reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+  function animateCount(el){
+    const target = parseFloat(el.dataset.target);
+    if(reduceMotion){ el.textContent = target; return; }
+    const duration = 1100;
+    const start = performance.now();
+    function step(now){
+      const p = Math.min(1, (now-start)/duration);
+      const eased = 1 - Math.pow(1-p, 3);
+      const val = Math.round(target*eased);
+      el.textContent = val;
+      if(p<1) requestAnimationFrame(step);
+    }
+    requestAnimationFrame(step);
+  }
+
+  if(!reduceMotion){
+    const observer = new IntersectionObserver((entries) => {
+      entries.forEach(e => {
+        if(e.isIntersecting){
+          e.target.classList.add('in-view');
+          e.target.querySelectorAll('.count-up').forEach(animateCount);
+          observer.unobserve(e.target);
+        }
+      });
+    }, { threshold: 0.15 });
+    document.querySelectorAll('.reveal').forEach(el => observer.observe(el));
+  } else {
+    document.querySelectorAll('.reveal').forEach(el => {
+      el.classList.add('in-view');
+      el.querySelectorAll('.count-up').forEach(animateCount);
+    });
+  }
+
+  // Hero instrument: waveform that settles from noisy to stable, looping
+  const canvas = document.getElementById('waveform');
+  const ctx = canvas.getContext('2d');
+  const statusPill = document.getElementById('statusPill');
+  const statusText = document.getElementById('statusText');
+  const vibVal = document.getElementById('vibVal');
+  const tempVal = document.getElementById('tempVal');
+
+  function resizeCanvas(){
+    const rect = canvas.getBoundingClientRect();
+    canvas.width = rect.width * window.devicePixelRatio;
+    canvas.height = rect.height * window.devicePixelRatio;
+    ctx.scale(window.devicePixelRatio, window.devicePixelRatio);
+  }
+  resizeCanvas();
+  window.addEventListener('resize', () => { ctx.setTransform(1,0,0,1,0,0); resizeCanvas(); });
+
+  const CYCLE = 7000; // ms
+  const SETTLE = 3200; // ms within cycle when it becomes stable
+  let start = performance.now();
+
+  function lerpColor(a, b, t){
+    const ah = a.match(/\w\w/g).map(x=>parseInt(x,16));
+    const bh = b.match(/\w\w/g).map(x=>parseInt(x,16));
+    const r = ah.map((c,i)=>Math.round(c + (bh[i]-c)*t));
+    return `rgb(${r[0]},${r[1]},${r[2]})`;
+  }
+
+  function draw(now){
+    const w = canvas.getBoundingClientRect().width;
+    const h = canvas.getBoundingClientRect().height;
+    ctx.clearRect(0,0,w,h);
+
+    let t = (now - start) % CYCLE;
+    let noiseAmt = t < SETTLE ? 1 - (t/SETTLE) : 0;
+    // ease
+    noiseAmt = noiseAmt*noiseAmt;
+
+    const stable = noiseAmt < 0.08;
+    if(stable){
+      statusPill.classList.add('stable');
+      statusText.textContent = 'ESTÁVEL';
+    } else {
+      statusPill.classList.remove('stable');
+      statusText.textContent = 'MONITORANDO';
+    }
+
+    const color = lerpColor('E8954A','6FE7B0', 1-noiseAmt);
+
+    ctx.beginPath();
+    const mid = h/2;
+    const points = 140;
+    for(let i=0;i<=points;i++){
+      const x = (i/points)*w;
+      const phase = (now/450) + i*0.35;
+      const base = Math.sin(phase) * (h*0.16);
+      const noise = (Math.sin(i*1.7 + now/60) * (h*0.30) + (Math.random()-0.5)*h*0.22) * noiseAmt;
+      const y = mid + base + noise;
+      if(i===0) ctx.moveTo(x,y); else ctx.lineTo(x,y);
+    }
+    ctx.strokeStyle = color;
+    ctx.lineWidth = 1.6;
+    ctx.stroke();
+
+    // readouts
+    const vib = (0.4 + noiseAmt*3.1 + Math.sin(now/300)*0.05).toFixed(2);
+    const temp = (52 + noiseAmt*9 + Math.sin(now/500)*0.4).toFixed(1);
+    vibVal.innerHTML = vib + '<span> mm/s²</span>';
+    tempVal.innerHTML = temp + '<span> °C</span>';
+
+    requestAnimationFrame(draw);
+  }
+
+  if(reduceMotion){
+    // static calm frame
+    const w = canvas.getBoundingClientRect().width;
+    const h = canvas.getBoundingClientRect().height;
+    ctx.beginPath();
+    for(let i=0;i<=140;i++){
+      const x = (i/140)*w;
+      const y = h/2 + Math.sin(i*0.3)*(h*0.14);
+      if(i===0) ctx.moveTo(x,y); else ctx.lineTo(x,y);
+    }
+    ctx.strokeStyle = '#6FE7B0';
+    ctx.lineWidth = 1.6;
+    ctx.stroke();
+    statusPill.classList.add('stable');
+    statusText.textContent = 'ESTÁVEL';
+    vibVal.innerHTML = '0.42<span> mm/s²</span>';
+    tempVal.innerHTML = '52.1<span> °C</span>';
+  } else {
+    requestAnimationFrame(draw);
+  }
+</script>
+
+</body>
+</html>
